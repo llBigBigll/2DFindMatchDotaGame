@@ -6,47 +6,82 @@ using UnityEngine.UI;
 
 public class GameLogic : MonoBehaviour
 {
-    public GameObject timer;
-    
+    public GameObject CanvasManager;
+
+    public GameObject timerHandler;
+    public GameObject scoreHandler;
+
     public GameObject SearchPanel;
     public GameObject TaskPanel;
-    
+
+    public int TaskSize;
+    public int SearchListSize;
+
     public TextAsset HeroListFile;
 
     public GameObject HeroPlatePrefab;
 
+    public float startTime;
+
     private Text timerText;
+    private Text scoreText;
 
     private List<string> searchingFieldList;
     private List<string> taskList;
     private List<string> foundList;
     private List<string> listOfNames;
 
+    private int score;
+
+    private static Color transparent = new Color(0f, 0f, 0f, 0f);
     // Start is called before the first frame update
     void Start()
     {
-        timerText = timer.GetComponentInChildren<Text>();
+        timerText = timerHandler.GetComponentInChildren<Text>();
+        scoreText = scoreHandler.GetComponentInChildren<Text>();
+        SetScore(0);
+
         listOfNames = getTexturesNames(HeroListFile);
         foundList = new List<string>();
 
-        searchingFieldList = GetRandomElementsFromList(listOfNames, 8);
-        taskList = GetRandomElementsFromList(searchingFieldList, 3);
+        searchingFieldList = GetRandomElementsFromList(listOfNames, SearchListSize);
+        taskList = GetRandomElementsFromList(searchingFieldList, TaskSize);
 
         InstantiateSearchingList();
         InstantiateTaskList();
+
+
+        TaskPanel.GetComponent<Image>().color = transparent;
     }
 
     // Update is called once per frame
     void Update()
     {
         SetTimeText(timerText);
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            CanvasManager.GetComponent<CanvasManager>().SetToMainMenu();
+        }
     }
 
-    private void SetTimeText(Text textHandler, float beginTime = 0f)
+    private void SetTimeText(Text textHandler)
     {
-        var min = (int)((Time.time - beginTime) / 60f);
-        var sec = (int)((Time.time - beginTime) % 60f);
+        var min = (int)((Time.time - startTime) / 60f);
+        var sec = (int)((Time.time - startTime) % 60f);
         textHandler.text = min.ToString("00") + ":" + sec.ToString("00");
+    }
+
+    private void ChangeScore(int changeValue)
+    {
+        score += changeValue;
+        scoreText.text = $"Score: {score}";
+    }
+
+    private void SetScore(int settingValue)
+    {
+        score = settingValue;
+        scoreText.text = $"Score: {score}";
     }
 
     public static List<string> getTexturesNames(TextAsset textFile)
@@ -148,12 +183,16 @@ public class GameLogic : MonoBehaviour
             var activeColor = Color.yellow;
             activeColor.a = 0.6f;
             background.GetComponent<Image>().color = activeColor;
+            background.GetComponent<Image>().raycastTarget = false;
+            ChangeScore(1);
         }
         if (!taskList.Contains(name)) 
         {
             var wrongColor = Color.red;
             wrongColor.a = 0.6f;
             background.GetComponent<Image>().color = wrongColor;
+            background.GetComponent<Image>().raycastTarget = false;
+            ChangeScore(-1);
         }
 
         if (CheckWin()) 
@@ -176,8 +215,8 @@ public class GameLogic : MonoBehaviour
 
         foundList = new List<string>();
 
-        searchingFieldList = GetRandomElementsFromList(listOfNames, 8);
-        taskList = GetRandomElementsFromList(searchingFieldList, 3);
+        searchingFieldList = GetRandomElementsFromList(listOfNames, SearchListSize);
+        taskList = GetRandomElementsFromList(searchingFieldList, TaskSize);
 
         InstantiateSearchingList();
         InstantiateTaskList();
