@@ -6,6 +6,7 @@ public class MenuLogicHandler : MonoBehaviour
 {
     public GameObject ButtonsHandler;
     public GameObject SettingsHandler;
+    public GameObject GameLogicHandler;
 
     public GameObject CanvasManager;
 

@@ -201,8 +201,11 @@ public class GameLogic : MonoBehaviour
         }
     }
 
-    private void ResetMg() 
+    public void ResetMg() 
     {
+        startTime = Time.time;
+        SetScore(0);
+
         for (int i = 0; i < TaskPanel.transform.childCount; i++)
         {
             Destroy(TaskPanel.transform.GetChild(i).gameObject);

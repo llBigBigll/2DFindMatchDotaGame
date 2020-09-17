@@ -6,6 +6,7 @@ public class CanvasManager : MonoBehaviour
 {
     public GameObject MenuCanvas;
     public GameObject GameplayCanvas;
+    public GameObject GameLogicHandler;
 
     // Start is called before the first frame update
     void Start()
@@ -27,6 +28,7 @@ public class CanvasManager : MonoBehaviour
 
     public void SetToGameMenu() 
     {
+        GameLogicHandler.GetComponent<GameLogic>().ResetMg();
         MenuCanvas.SetActive(false);
         GameplayCanvas.SetActive(true);
     }

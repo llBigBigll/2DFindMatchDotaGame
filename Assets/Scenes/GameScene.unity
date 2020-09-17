@@ -1007,6 +1007,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ButtonsHandler: {fileID: 2108363630}
   SettingsHandler: {fileID: 1276641737}
+  GameLogicHandler: {fileID: 1146862260}
   CanvasManager: {fileID: 1847862082}
 --- !u!1 &768240360
 GameObject:
@@ -1519,7 +1520,7 @@ MonoBehaviour:
   HeroListFile: {fileID: 4900000, guid: 245954b2cc5c54d4d80400e3738f3b2e, type: 3}
   HeroPlatePrefab: {fileID: 7676707471353391390, guid: 3c9ce1b1afaa6b648ad50ca32f0b78a0,
     type: 3}
-  startTime: 5
+  startTime: 0
 --- !u!4 &1146862262
 Transform:
   m_ObjectHideFlags: 0
@@ -2199,6 +2200,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MenuCanvas: {fileID: 2145368470}
   GameplayCanvas: {fileID: 1965716676}
+  GameLogicHandler: {fileID: 1146862260}
 --- !u!1 &1965716676
 GameObject:
   m_ObjectHideFlags: 0
@@ -2218,7 +2220,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1965716677
 RectTransform:
   m_ObjectHideFlags: 0
