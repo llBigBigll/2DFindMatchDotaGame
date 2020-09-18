@@ -35,6 +35,10 @@ public class HeroesGridLayout : LayoutGroup
     {
         base.CalculateLayoutInputHorizontal();
 
+        //float paddingY = padding.top + padding.top - padding.bottom;
+        //float paddingX = padding.right + padding.right - padding.left;
+        float paddingY = padding.top;
+        float paddingX = padding.left;
         
         float parentWidth = rectTransform.rect.width;
         float parentHeight = rectTransform.rect.height;
@@ -59,17 +63,18 @@ public class HeroesGridLayout : LayoutGroup
             {
                 if (LockSpacing)
                 {
-                    Cols = Mathf.FloorToInt(parentWidth / (CellSize.x + Spacing.x));
+                    Cols = Mathf.FloorToInt((parentWidth - padding.left - padding.right) / (CellSize.x + Spacing.x));
                     Rows = Mathf.CeilToInt((float)transform.childCount / (float)Cols);
-                    Debug.Log($"parentWidth = {parentWidth}, CellSize.x = {CellSize.x}, Spacing.x = {Spacing.x}");
+                    //Debug.Log($"parentWidth = {parentWidth}, CellSize.x = {CellSize.x}, Spacing.x = {Spacing.x}");
                 }
             }
         }
 
         if ((!LockSize)) 
         {
-            CellSize.x = (parentWidth - (Cols - 1) * Spacing.x) / Cols;
-            CellSize.y = (parentHeight - (Rows - 1) * Spacing.y) / Rows;
+            CellSize.x = ((parentWidth - padding.left - padding.right) - (Cols - 1) * Spacing.x) / Cols;
+            CellSize.y = ((parentHeight - padding.top - padding.bottom) - (Rows - 1) * Spacing.y) / Rows;
+            Debug.Log($"{parentWidth}, {padding.left}, {padding.right}");
         }
 
         if ((!LockSize) && (!LockCols) && (!LockCols)) 
@@ -81,10 +86,10 @@ public class HeroesGridLayout : LayoutGroup
         
         int fullRows = rectChildren.Count / Cols;
         int fullRowsLastIdx = fullRows*Cols;
-        float fullRowPaddingX = (parentWidth - (Cols * CellSize.x + (Cols - 1) * Spacing.x)) / 2;
+        float fullRowPaddingX = ((parentWidth - padding.left - padding.right) - (Cols * CellSize.x + (Cols - 1) * Spacing.x)) / 2;
 
         int numInLast = rectChildren.Count % Cols;
-        float lastRowPaddingX = (parentWidth - (numInLast * CellSize.x + (numInLast - 1) * Spacing.x)) / 2;
+        float lastRowPaddingX = ((parentWidth - padding.left - padding.right) - (numInLast * CellSize.x + (numInLast - 1) * Spacing.x)) / 2;
 
         for (int i = 0; i < rectChildren.Count; i++) 
         {
@@ -95,8 +100,8 @@ public class HeroesGridLayout : LayoutGroup
 
             if (i < fullRowsLastIdx)
             {
-                var xPos = (CellSize.x * colIdx) + Spacing.x * colIdx + fullRowPaddingX;
-                var yPos = (CellSize.y * rowIdx) + Spacing.y * rowIdx + padding.top;
+                var xPos = (CellSize.x * colIdx) + Spacing.x * colIdx + fullRowPaddingX + paddingX;
+                var yPos = (CellSize.y * rowIdx) + Spacing.y * rowIdx + paddingY;
 
                 SetChildAlongAxis(child, 0, xPos, CellSize.x);
                 SetChildAlongAxis(child, 1, yPos, CellSize.y);
@@ -108,7 +113,7 @@ public class HeroesGridLayout : LayoutGroup
                     lastRowPaddingX = 0;
                 }
                 var xPos = (CellSize.x * colIdx) + Spacing.x * colIdx + lastRowPaddingX;
-                var yPos = (CellSize.y * rowIdx) + Spacing.y * rowIdx + padding.top;
+                var yPos = (CellSize.y * rowIdx) + Spacing.y * rowIdx + paddingY;
 
                 SetChildAlongAxis(child, 0, xPos, CellSize.x);
                 SetChildAlongAxis(child, 1, yPos, CellSize.y);

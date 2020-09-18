@@ -33,6 +33,8 @@ public class GameLogic : MonoBehaviour
 
     private int score;
 
+    private bool isInGame;
+
     private static Color transparent = new Color(0f, 0f, 0f, 0f);
     // Start is called before the first frame update
     void Start()
@@ -50,18 +52,23 @@ public class GameLogic : MonoBehaviour
         InstantiateSearchingList();
         InstantiateTaskList();
 
-
         TaskPanel.GetComponent<Image>().color = transparent;
+
+        isInGame = false;
     }
 
     // Update is called once per frame
     void Update()
     {
-        SetTimeText(timerText);
-
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (isInGame) 
         {
-            CanvasManager.GetComponent<CanvasManager>().SetToMainMenu();
+            SetTimeText(timerText);
+
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                isInGame = false;
+                CanvasManager.GetComponent<CanvasManager>().SetToMainMenu();
+            }
         }
     }
 
@@ -112,8 +119,15 @@ public class GameLogic : MonoBehaviour
             heroCell.transform.GetChild(1).GetComponent<Image>().sprite = sprite;
             var eventTriger = heroCell.transform.GetChild(0).GetComponent<EventTrigger>();
             AddEventTriggerListener(eventTriger, EventTriggerType.PointerClick, onPlateMouseDown);
-
         }
+
+        //for (var i = 0; i< SearchPanel.transform.childCount; i++)
+        //{
+        //    var cell = SearchPanel.transform.GetChild(i);
+        //    var cellSize = cell.GetComponent<RectTransform>().sizeDelta;
+        //    cell.transform.GetChild(1).GetComponent<Image>().rectTransform.sizeDelta = cellSize;
+        //    cell.transform.GetChild(0).GetComponent<Image>().rectTransform.sizeDelta = cellSize;
+        //}
     }
     private void InstantiateTaskList() 
     {
@@ -129,6 +143,18 @@ public class GameLogic : MonoBehaviour
             heroCell.name = heroName;
             heroCell.transform.SetParent(TaskPanel.transform, false);
             heroCell.transform.GetChild(1).GetComponent<Image>().sprite = sprite;
+
+            //var parentsize = heroCell.GetComponent<RectTransform>().sizeDelta;
+            //heroCell.transform.GetChild(1).GetComponent<Image>().rectTransform.sizeDelta = parentsize;
+
+            //for (var i = 0; i < TaskPanel.transform.childCount; i++)
+            //{
+            //    var cell = TaskPanel.transform.GetChild(i);
+            //    var cellSize = cell.GetComponent<RectTransform>().sizeDelta;
+            //    cell.transform.GetChild(1).GetComponent<Image>().rectTransform.sizeDelta = cellSize;
+            //    cell.transform.GetChild(0).GetComponent<Image>().rectTransform.sizeDelta = cellSize;
+            //}
+
         }
     }
     private static List<T> GetRandomElementsFromList<T>(List<T> list, int numberOfElements, bool canRepeat = false) 
@@ -201,7 +227,7 @@ public class GameLogic : MonoBehaviour
         }
     }
 
-    public void ResetMg() 
+    private void ResetMg() 
     {
         startTime = Time.time;
         SetScore(0);
@@ -224,6 +250,13 @@ public class GameLogic : MonoBehaviour
         InstantiateSearchingList();
         InstantiateTaskList();
     }
+
+    public void RestartMg() 
+    {
+        isInGame = true;
+        ResetMg();
+    }
+
     private bool CheckWin() 
     {
         bool answer = true;
