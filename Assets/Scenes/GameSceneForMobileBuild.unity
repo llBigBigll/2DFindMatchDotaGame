@@ -1576,6 +1576,7 @@ MonoBehaviour:
   TaskPanel: {fileID: 1829807510}
   TaskSize: 3
   SearchListSize: 91
+  SecondsToBlockOnWrongClick: 5
   HeroListFile: {fileID: 4900000, guid: 245954b2cc5c54d4d80400e3738f3b2e, type: 3}
   HeroPlatePrefab: {fileID: 7676707471353391390, guid: 3c9ce1b1afaa6b648ad50ca32f0b78a0,
     type: 3}

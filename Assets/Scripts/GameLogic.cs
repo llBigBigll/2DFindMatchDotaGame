@@ -17,6 +17,7 @@ public class GameLogic : MonoBehaviour
 
     public int TaskSize;
     public int SearchListSize;
+    public float SecondsToBlockOnWrongClick;
 
     public TextAsset HeroListFile;
 
@@ -37,9 +38,13 @@ public class GameLogic : MonoBehaviour
     private int score;
     private int failure;
 
+    private float lastWrongClickTime;
+    private bool isBlockedClicking;
+
     private bool isInGame;
 
     private static Color transparent = new Color(0f, 0f, 0f, 0f);
+    private static Color shadedImg = new Color(0.35f, 0.35f, 0.35f, 1f);
     // Start is called before the first frame update
     void Start()
     {
@@ -195,6 +200,19 @@ public class GameLogic : MonoBehaviour
 
     public void onPlateMouseDown(BaseEventData data)
     {
+        if (isBlockedClicking)
+        {
+            var secs = (int)((Time.time - lastWrongClickTime) % 60f);
+            if (SecondsToBlockOnWrongClick > secs)
+            {
+                return;
+            }
+            else 
+            {
+                isBlockedClicking = false;
+            }
+        }
+
         var other = (PointerEventData)data;
         GameObject background = other.pointerEnter;
         string name = other.pointerEnter.transform.parent.gameObject.name;
@@ -209,10 +227,17 @@ public class GameLogic : MonoBehaviour
         }
         if (!taskList.Contains(name)) 
         {
-            var wrongColor = Color.red;
-            wrongColor.a = 0.6f;
-            background.GetComponent<Image>().color = wrongColor;
-            background.GetComponent<Image>().raycastTarget = false;
+            isBlockedClicking = true;
+            lastWrongClickTime = Time.time;
+
+            // SETTING BACK TO RED
+            //var wrongColor = Color.red;
+            //wrongColor.a = 0.6f;
+            //background.GetComponent<Image>().color = wrongColor;
+            //background.GetComponent<Image>().raycastTarget = false;
+
+            background.transform.parent.GetChild(1).GetComponent<Image>().color = shadedImg;
+
             ChangeScore(-1);
             ChangeFailure(-1);
         }
