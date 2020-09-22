@@ -10,6 +10,7 @@ public class GameLogic : MonoBehaviour
 
     public GameObject timerHandler;
     public GameObject scoreHandler;
+    public GameObject failureHandler;
 
     public GameObject SearchPanel;
     public GameObject TaskPanel;
@@ -21,10 +22,12 @@ public class GameLogic : MonoBehaviour
 
     public GameObject HeroPlatePrefab;
 
-    public float startTime;
+    private float startTimeGame;
+    private float startTimeRound;
 
     private Text timerText;
     private Text scoreText;
+    private Text failureText;
 
     private List<string> searchingFieldList;
     private List<string> taskList;
@@ -32,6 +35,7 @@ public class GameLogic : MonoBehaviour
     private List<string> listOfNames;
 
     private int score;
+    private int failure;
 
     private bool isInGame;
 
@@ -41,7 +45,11 @@ public class GameLogic : MonoBehaviour
     {
         timerText = timerHandler.GetComponentInChildren<Text>();
         scoreText = scoreHandler.GetComponentInChildren<Text>();
+        failureText = failureHandler.GetComponentInChildren<Text>();
+
         SetScore(0);
+
+        SetFailure(0);
 
         listOfNames = getTexturesNames(HeroListFile);
         foundList = new List<string>();
@@ -74,8 +82,8 @@ public class GameLogic : MonoBehaviour
 
     private void SetTimeText(Text textHandler)
     {
-        var min = (int)((Time.time - startTime) / 60f);
-        var sec = (int)((Time.time - startTime) % 60f);
+        var min = (int)((Time.time - startTimeGame) / 60f);
+        var sec = (int)((Time.time - startTimeGame) % 60f);
         textHandler.text = min.ToString("00") + ":" + sec.ToString("00");
     }
 
@@ -89,6 +97,18 @@ public class GameLogic : MonoBehaviour
     {
         score = settingValue;
         scoreText.text = $"Score: {score}";
+    }
+
+    private void ChangeFailure(int changeValue)
+    {
+        failure += changeValue;
+        failureText.text = $"Failure: {failure}";
+    }
+
+    private void SetFailure(int settingValue)
+    {
+        failure = settingValue;
+        failureText.text = $"Failure: {failure}";
     }
 
     public static List<string> getTexturesNames(TextAsset textFile)
@@ -112,7 +132,6 @@ public class GameLogic : MonoBehaviour
             {
                 Debug.Log($"Не удалось найти текстуру с именем: \"{heroName}\"");
             }
-
             var heroCell = Instantiate(HeroPlatePrefab, new Vector3(0, 0, 0), Quaternion.identity);
             heroCell.name = heroName;
             heroCell.transform.SetParent(SearchPanel.transform, false);
@@ -120,41 +139,12 @@ public class GameLogic : MonoBehaviour
             var eventTriger = heroCell.transform.GetChild(0).GetComponent<EventTrigger>();
             AddEventTriggerListener(eventTriger, EventTriggerType.PointerClick, onPlateMouseDown);
         }
-
-        //for (var i = 0; i< SearchPanel.transform.childCount; i++)
-        //{
-        //    var cell = SearchPanel.transform.GetChild(i);
-        //    var cellSize = cell.GetComponent<RectTransform>().sizeDelta;
-        //    cell.transform.GetChild(1).GetComponent<Image>().rectTransform.sizeDelta = cellSize;
-        //    cell.transform.GetChild(0).GetComponent<Image>().rectTransform.sizeDelta = cellSize;
-        //}
     }
     private void InstantiateTaskList() 
     {
         foreach (var heroName in taskList)
         {
-            var sprite = Resources.Load<Sprite>($"HeroesPics/{heroName}");
-            if (sprite == null) 
-            {
-                Debug.Log($"Не удалось найти текстуру с именем: \"{heroName}\"");
-            }
-
-            var heroCell = Instantiate(HeroPlatePrefab, new Vector3(0, 0, 0), Quaternion.identity);
-            heroCell.name = heroName;
-            heroCell.transform.SetParent(TaskPanel.transform, false);
-            heroCell.transform.GetChild(1).GetComponent<Image>().sprite = sprite;
-
-            //var parentsize = heroCell.GetComponent<RectTransform>().sizeDelta;
-            //heroCell.transform.GetChild(1).GetComponent<Image>().rectTransform.sizeDelta = parentsize;
-
-            //for (var i = 0; i < TaskPanel.transform.childCount; i++)
-            //{
-            //    var cell = TaskPanel.transform.GetChild(i);
-            //    var cellSize = cell.GetComponent<RectTransform>().sizeDelta;
-            //    cell.transform.GetChild(1).GetComponent<Image>().rectTransform.sizeDelta = cellSize;
-            //    cell.transform.GetChild(0).GetComponent<Image>().rectTransform.sizeDelta = cellSize;
-            //}
-
+            TaskPanel.transform.GetChild(0).GetComponent<Text>().text += heroName + "\n";
         }
     }
     private static List<T> GetRandomElementsFromList<T>(List<T> list, int numberOfElements, bool canRepeat = false) 
@@ -198,6 +188,11 @@ public class GameLogic : MonoBehaviour
         trigger.triggers.Add(entry);
     }
 
+    public void OnReserBttnClick()
+    {
+        RestartMg();
+    }
+
     public void onPlateMouseDown(BaseEventData data)
     {
         var other = (PointerEventData)data;
@@ -219,22 +214,46 @@ public class GameLogic : MonoBehaviour
             background.GetComponent<Image>().color = wrongColor;
             background.GetComponent<Image>().raycastTarget = false;
             ChangeScore(-1);
+            ChangeFailure(-1);
         }
 
         if (CheckWin()) 
         {
-            ResetMg();
+            ResetRound();
         }
+    }
+
+    private void ResetRound()
+    {
+        startTimeRound = Time.time;
+
+        TaskPanel.transform.GetChild(0).GetComponent<Text>().text = "";
+
+        for (int i = 0; i < SearchPanel.transform.childCount; i++)
+        {
+            Destroy(SearchPanel.transform.GetChild(i).gameObject);
+        }
+
+        foundList = new List<string>();
+
+        searchingFieldList = GetRandomElementsFromList(listOfNames, SearchListSize);
+        taskList = GetRandomElementsFromList(searchingFieldList, TaskSize);
+
+        InstantiateSearchingList();
+        InstantiateTaskList();
     }
 
     private void ResetMg() 
     {
-        startTime = Time.time;
+        startTimeGame = Time.time;
+        startTimeRound = Time.time;
+
         SetScore(0);
+        SetFailure(0);
 
         for (int i = 0; i < TaskPanel.transform.childCount; i++)
         {
-            Destroy(TaskPanel.transform.GetChild(i).gameObject);
+            TaskPanel.transform.GetChild(0).GetComponent<Text>().text = "";
         }
 
         for (int i = 0; i < SearchPanel.transform.childCount; i++)
@@ -256,7 +275,11 @@ public class GameLogic : MonoBehaviour
         isInGame = true;
         ResetMg();
     }
-
+    public void RestartRound()
+    {
+        isInGame = true;
+        ResetRound();
+    }
     private bool CheckWin() 
     {
         bool answer = true;
@@ -270,5 +293,4 @@ public class GameLogic : MonoBehaviour
         }
         return answer;
     }
-
 }
