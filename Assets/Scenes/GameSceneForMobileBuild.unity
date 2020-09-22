@@ -1571,6 +1571,7 @@ MonoBehaviour:
   CanvasManager: {fileID: 1847862082}
   timerHandler: {fileID: 1063451341}
   scoreHandler: {fileID: 1033751508}
+  failureHandler: {fileID: 1289412848}
   SearchPanel: {fileID: 421007258}
   TaskPanel: {fileID: 1829807510}
   TaskSize: 3
@@ -1578,8 +1579,6 @@ MonoBehaviour:
   HeroListFile: {fileID: 4900000, guid: 245954b2cc5c54d4d80400e3738f3b2e, type: 3}
   HeroPlatePrefab: {fileID: 7676707471353391390, guid: 3c9ce1b1afaa6b648ad50ca32f0b78a0,
     type: 3}
-  startTimeGame: 0
-  startTimeRound: 0
 --- !u!4 &1146862262
 Transform:
   m_ObjectHideFlags: 0
@@ -2254,7 +2253,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1619062697}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1146862261}
+        m_TargetAssemblyTypeName: GameLogic, Assembly-CSharp
+        m_MethodName: OnReserBttnClick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1619062697
 MonoBehaviour:
   m_ObjectHideFlags: 0
